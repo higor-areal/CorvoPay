@@ -2,5 +2,5 @@ use serde::{Deserialize, Serialize};
 
 #[derive(Debug, Serialize, Deserialize)]
 pub struct CardData{
-    pub numer: String,
+    pub number: String,
 }

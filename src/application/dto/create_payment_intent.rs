@@ -14,6 +14,8 @@ pub struct PaymentIntentInput{
     pub payment_method: PaymentMethod,
 }
 
+//testes de exemplo, essas não são as entradas corretas
+
 #[allow(dead_code)]
 #[cfg(test)]
 mod tests {
@@ -56,7 +58,7 @@ mod tests {
     }
 
     fn card() -> PaymentMethod {
-        PaymentMethod::Card(CardData { numer: "4111111111111111".to_string() })
+        PaymentMethod::Card(CardData { number: "4111111111111111".to_string() })
     }
 
     fn boleto() -> PaymentMethod {
@@ -101,7 +103,7 @@ mod tests {
         #[test]
         fn should_deserialize_payment_intent_with_card() {
             let json = format!(
-                r#"{{"amount":{},"payer":{},"payment_method":{{"type":"card","numer":"4111111111111111"}}}}"#,
+                r#"{{"amount":{},"payer":{},"payment_method":{{"type":"card","number":"4111111111111111"}}}}"#,
                 AMOUNT_VALIDO,
                 json_payer_cpf()
             );
@@ -313,7 +315,7 @@ mod tests {
         #[test]
         fn should_match_card_variant_after_deserialization() {
             let json = format!(
-                r#"{{"amount":{},"payer":{},"payment_method":{{"type":"card","numer":"4111111111111111"}}}}"#,
+                r#"{{"amount":{},"payer":{},"payment_method":{{"type":"card","number":"4111111111111111"}}}}"#,
                 AMOUNT_VALIDO,
                 json_payer_cpf()
             );
