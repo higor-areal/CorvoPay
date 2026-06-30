@@ -1,6 +1,6 @@
 use serde::{Serialize, Deserialize};
 
-use crate::domain::value_objects::gateway::Gateway;
+use crate::domain::gateway::gateway::GatewayName;
 /// Status normalizado — traduzido pelo mapper de cada gateway.
 #[derive(Debug, Clone, Serialize, Deserialize, PartialEq)]
 #[serde(rename_all = "snake_case")]
@@ -16,11 +16,11 @@ pub enum PaymentStatus {
 
 #[allow(dead_code)]
 impl PaymentStatus{
-    pub fn from_gateway(gateway: Gateway, status: &str) -> Self{
+    pub fn from_gateway(gateway: GatewayName, status: &str) -> Self{
         match gateway {
-            Gateway::MercadoPago =>Self::from_mercado_pago(status),
-            Gateway::Pagarme => Self::from_pagarme(status),
-            Gateway::Stripe => Self::from_stripe(status)
+            GatewayName::MercadoPago =>Self::from_mercado_pago(status),
+            GatewayName::Pagarme => Self::from_pagarme(status),
+            GatewayName::Stripe => Self::from_stripe(status)
         }
     }
 }
@@ -67,7 +67,7 @@ mod tests {
 
         #[test]
         fn should_return_paid_when_mercado_pago_status_is_approved() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "approved");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "approved");
             assert_eq!(result, PaymentStatus::Paid);
         }
 
@@ -75,19 +75,19 @@ mod tests {
 
         #[test]
         fn should_return_pending_when_mercado_pago_status_is_action_required() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "action_required");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "action_required");
             assert_eq!(result, PaymentStatus::Pending);
         }
 
         #[test]
         fn should_return_pending_when_mercado_pago_status_is_pending() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "pending");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "pending");
             assert_eq!(result, PaymentStatus::Pending);
         }
 
         #[test]
         fn should_return_pending_when_mercado_pago_status_is_in_process() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "in_process");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "in_process");
             assert_eq!(result, PaymentStatus::Pending);
         }
 
@@ -95,19 +95,19 @@ mod tests {
 
         #[test]
         fn should_return_failed_when_mercado_pago_status_is_rejected() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "rejected");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "rejected");
             assert_eq!(result, PaymentStatus::Failed);
         }
 
         #[test]
         fn should_return_failed_when_mercado_pago_status_is_cancelled() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "cancelled");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "cancelled");
             assert_eq!(result, PaymentStatus::Failed);
         }
 
         #[test]
         fn should_return_failed_when_mercado_pago_status_is_charged_back() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "charged_back");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "charged_back");
             assert_eq!(result, PaymentStatus::Failed);
         }
 
@@ -115,7 +115,7 @@ mod tests {
 
         #[test]
         fn should_return_refunded_when_mercado_pago_status_is_refunded() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "refunded");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "refunded");
             assert_eq!(result, PaymentStatus::Refunded);
         }
 
@@ -123,7 +123,7 @@ mod tests {
 
         #[test]
         fn should_return_expired_when_mercado_pago_status_is_expired() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "expired");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "expired");
             assert_eq!(result, PaymentStatus::Expired);
         }
 
@@ -131,13 +131,13 @@ mod tests {
 
         #[test]
         fn should_return_invalid_response_when_mercado_pago_status_is_unknown() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "unknown_status");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "unknown_status");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
 
         #[test]
         fn should_return_invalid_response_when_mercado_pago_status_is_empty_string() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
     }
@@ -148,26 +148,26 @@ mod tests {
         #[test]
         fn should_return_invalid_response_when_status_is_uppercase_approved() {
             // from_mercado_pago faz match exato — case sensitive
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "APPROVED");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "APPROVED");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
 
         #[test]
         fn should_return_invalid_response_when_status_has_leading_whitespace() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, " approved");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, " approved");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
 
         #[test]
         fn should_return_invalid_response_when_status_has_trailing_whitespace() {
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "approved ");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "approved ");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
 
         #[test]
         fn should_return_invalid_response_for_pagarme_only_status_pending_refund() {
             // pending_refund não existe no mapeamento do MercadoPago
-            let result = PaymentStatus::from_gateway(Gateway::MercadoPago, "pending_refund");
+            let result = PaymentStatus::from_gateway(GatewayName::MercadoPago, "pending_refund");
             assert_eq!(result, PaymentStatus::InvalidResponse);
         }
     }
